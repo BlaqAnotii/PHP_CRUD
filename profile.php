@@ -3,8 +3,9 @@ include "connect.php";
 session_start();
 if (isset($_SESSION['id'])) {
     # code...
-    $userid = $_SESSION['id'];
-    $sql = "SELECT * FROM `users` WHERE `id`='$userid'";
+
+    $sessionid = $_SESSION['id'];
+    $sql = "SELECT * FROM `users` WHERE `id`='$sessionid'";
     $query = mysqli_query($conn, $sql);
     if (mysqli_num_rows($query) > 0) {
         # code...
@@ -98,8 +99,8 @@ if (mysqli_num_rows($query) > 0) {
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Product</th>
-            <th>Cost</th>
+            <th>Product Name</th>
+            <th>ProductID</th>
             <th>Stock</th>
             <th>Date</th>
             <th>Action</th>
@@ -107,20 +108,51 @@ if (mysqli_num_rows($query) > 0) {
     </thead>
     <tbody>
         <!-- Add rows for each product in the store -->
-        <tr>
-            <td>Product A</td>
-            <td>$20.00</td>
-            <td>75</td>
-            <td>2023-10-12</td>
-            <td><button class="btn btn-primary">Edit</button></td>
+        <?php
+$sqlstore = "SELECT * FROM `store` WHERE `userid`= $sessionid ";
+$query = mysqli_query($conn, $sqlstore);
+if (mysqli_num_rows($query) > 0) {
+    # code...
+    while ($rowstore = mysqli_fetch_assoc($query)) {
+        # code...
+    $storeid = $rowstore["id"];
+    $userid = $rowstore["userid"];
+    $productid = $rowstore["productid"];
+    $stock = $rowstore["stock"];
+    $date = $rowstore["date"];
+$productsql = "SELECT * FROM `product` WHERE `id` = $productid";
+$productquery = mysqli_query($conn,$productsql);
+if (mysqli_num_rows($productquery) > 0) {
+    # code...
+    $productrow = mysqli_fetch_assoc($productquery);
+    $productname = $productrow["pname"];
+    
+} else {
+    # code...
+    echo "not valid";
+
+}
+
+    echo '
+    <tr>
+            <td>'.$productname.'</td>
+            <td>'.$productid.'</td>
+            <td>'.$stock.'</td>
+            <td>'.$date.'</td>
+
+            <td><a href="addproduct.php?id=' . $productid. '">Add</a></td>
         </tr>
-        <tr>
-            <td>Product B</td>
-            <td>$25.00</td>
-            <td>40</td>
-            <td>2023-10-11</td>
-            <td><button class="btn btn-primary">Edit</button></td>
-        </tr>
+    ';
+    }
+    
+
+} else {
+    # code...
+    echo "Not Successful";
+}
+
+
+?>
         <!-- Add more rows as needed -->
     </tbody>
 </table>
